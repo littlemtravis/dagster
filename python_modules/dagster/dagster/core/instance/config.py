@@ -3,7 +3,6 @@ import warnings
 
 from dagster import Array, Bool, check
 from dagster.config import Field, Permissive, Selector
-from dagster.config.source import IntSource, StringSource
 from dagster.config.validate import validate_config
 from dagster.core.errors import DagsterInvalidConfigError
 from dagster.core.storage.config import mysql_config, pg_config
@@ -103,13 +102,16 @@ def config_field_for_configurable_class():
 
 
 def storage_config_schema():
-    return Selector(
-        {
-            "postgres": Field(pg_config()),
-            "mysql": Field(mysql_config()),
-            "sqlite": Field({"base_dir": str}),
-            "custom": Field(configurable_class_schema()),
-        }
+    return Field(
+        Selector(
+            {
+                "postgres": Field(pg_config()),
+                "mysql": Field(mysql_config()),
+                "sqlite": Field({"base_dir": str}),
+                "custom": Field(configurable_class_schema()),
+            }
+        ),
+        is_required=False,
     )
 
 
