@@ -151,10 +151,10 @@ def params_specified_pg_config(hostname):
 
 
 def test_load_instance(hostname):
-    with instance_for_test(overrides=yaml.safe_load(full_pg_config(hostname))) as instance:
+    with instance_for_test(overrides=yaml.safe_load(full_pg_config(hostname))):
         pass
 
-    with instance_for_test(overrides=yaml.safe_load(unified_pg_config(hostname))) as instance:
+    with instance_for_test(overrides=yaml.safe_load(unified_pg_config(hostname))):
         pass
 
 
