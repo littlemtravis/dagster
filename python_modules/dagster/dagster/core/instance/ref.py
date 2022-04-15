@@ -116,7 +116,7 @@ def configurable_storage_data(config_field) -> CompositeStorageRef:
             ),
             schedule_storage_data=ConfigurableClassData(
                 module_name="dagster_mysql",
-                class_name="MySQLEventLogStorage",
+                class_name="MySQLScheduleStorage",
                 config_yaml=config_yaml,
             ),
         )
