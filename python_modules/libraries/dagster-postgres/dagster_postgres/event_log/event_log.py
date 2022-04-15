@@ -4,6 +4,7 @@ import sqlalchemy as db
 
 from dagster import check
 from dagster.core.events.log import EventLogEntry
+from dagster.core.storage.config import pg_config
 from dagster.core.storage.event_log import (
     AssetKeyTable,
     SqlEventLogStorage,
@@ -17,7 +18,6 @@ from dagster.serdes import ConfigurableClass, ConfigurableClassData, deserialize
 from ..utils import (
     create_pg_connection,
     pg_alembic_config,
-    pg_config,
     pg_statement_timeout,
     pg_url_from_config,
     retry_pg_connection_fn,

@@ -22,24 +22,6 @@ def get_conn(conn_string):
     return conn
 
 
-def pg_config():
-    return {
-        "postgres_url": Field(StringSource, is_required=False),
-        "postgres_db": Field(
-            {
-                "username": StringSource,
-                "password": StringSource,
-                "hostname": StringSource,
-                "db_name": StringSource,
-                "port": Field(IntSource, is_required=False, default_value=5432),
-                "params": Field(Permissive(), is_required=False, default_value={}),
-            },
-            is_required=False,
-        ),
-        "should_autocreate_tables": Field(bool, is_required=False, default_value=True),
-    }
-
-
 def pg_url_from_config(config_value):
 
     if config_value.get("postgres_url"):

@@ -1,5 +1,8 @@
+from typing import Optional
+
 from dagster import check
 from dagster.core.storage.base_storage import DagsterStorage
+from dagster.core.storage.config import pg_config
 from dagster.core.storage.event_log import EventLogStorage
 from dagster.core.storage.runs import RunStorage
 from dagster.core.storage.schedules import ScheduleStorage
@@ -8,7 +11,7 @@ from dagster.serdes import ConfigurableClass, ConfigurableClassData
 from .event_log import PostgresEventLogStorage
 from .run_storage import PostgresRunStorage
 from .schedule_storage import PostgresScheduleStorage
-from .utils import pg_config, pg_url_from_config
+from .utils import pg_url_from_config
 
 
 class DagsterPostgresStorage(DagsterStorage, ConfigurableClass):
@@ -68,3 +71,39 @@ class DagsterPostgresStorage(DagsterStorage, ConfigurableClass):
     @property
     def schedule_storage(self) -> ScheduleStorage:
         return self._schedule_storage
+
+    @property
+    def event_storage_data(self) -> Optional[ConfigurableClassData]:
+        return (
+            ConfigurableClassData(
+                "dagster_postgres",
+                "PostgresEventLogStorage",
+                self.inst_data.config_yaml,
+            )
+            if self.inst_data
+            else None
+        )
+
+    @property
+    def run_storage_data(self) -> Optional[ConfigurableClassData]:
+        return (
+            ConfigurableClassData(
+                "dagster_postgres",
+                "PostgresRunStorage",
+                self.inst_data.config_yaml,
+            )
+            if self.inst_data
+            else None
+        )
+
+    @property
+    def schedule_storage_data(self) -> Optional[ConfigurableClassData]:
+        return (
+            ConfigurableClassData(
+                "dagster_postgres",
+                "PostgresScheduleStorage",
+                self.inst_data.config_yaml,
+            )
+            if self.inst_data
+            else None
+        )

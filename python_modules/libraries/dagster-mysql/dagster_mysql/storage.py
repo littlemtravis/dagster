@@ -1,5 +1,8 @@
+from typing import Optional
+
 from dagster import check
 from dagster.core.storage.base_storage import DagsterStorage
+from dagster.core.storage.config import mysql_config
 from dagster.core.storage.event_log import EventLogStorage
 from dagster.core.storage.runs import RunStorage
 from dagster.core.storage.schedules import ScheduleStorage
@@ -8,7 +11,7 @@ from dagster.serdes import ConfigurableClass, ConfigurableClassData
 from .event_log import MySQLEventLogStorage
 from .run_storage import MySQLRunStorage
 from .schedule_storage import MySQLScheduleStorage
-from .utils import mysql_config, mysql_url_from_config
+from .utils import mysql_url_from_config
 
 
 class DagsterMySQLStorage(DagsterStorage, ConfigurableClass):
@@ -65,3 +68,39 @@ class DagsterMySQLStorage(DagsterStorage, ConfigurableClass):
     @property
     def schedule_storage(self) -> ScheduleStorage:
         return self._schedule_storage
+
+    @property
+    def event_storage_data(self) -> Optional[ConfigurableClassData]:
+        return (
+            ConfigurableClassData(
+                "dagster_mysql",
+                "MySQLEventLogStorage",
+                self.inst_data.config_yaml,
+            )
+            if self.inst_data
+            else None
+        )
+
+    @property
+    def run_storage_data(self) -> Optional[ConfigurableClassData]:
+        return (
+            ConfigurableClassData(
+                "dagster_mysql",
+                "MySQLRunStorage",
+                self.inst_data.config_yaml,
+            )
+            if self.inst_data
+            else None
+        )
+
+    @property
+    def schedule_storage_data(self) -> Optional[ConfigurableClassData]:
+        return (
+            ConfigurableClassData(
+                "dagster_mysql",
+                "MySQLScheduleStorage",
+                self.inst_data.config_yaml,
+            )
+            if self.inst_data
+            else None
+        )

@@ -31,21 +31,6 @@ def get_conn(conn_string):
     return conn
 
 
-def mysql_config():
-    return Selector(
-        {
-            "mysql_url": StringSource,
-            "mysql_db": {
-                "username": StringSource,
-                "password": StringSource,
-                "hostname": StringSource,
-                "db_name": StringSource,
-                "port": Field(IntSource, is_required=False, default_value=3306),
-            },
-        }
-    )
-
-
 def mysql_url_from_config(config_value):
     if config_value.get("mysql_url"):
         return config_value["mysql_url"]

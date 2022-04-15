@@ -1,4 +1,7 @@
+from typing import cast
+
 from dagster import check
+from dagster.serdes import ConfigurableClass, ConfigurableClassData
 
 from .base_storage import DagsterStorage
 from .event_log.base import EventLogStorage
@@ -28,3 +31,15 @@ class LegacyStorage(DagsterStorage):
     @property
     def schedule_storage(self) -> ScheduleStorage:
         return self._schedule_storage
+
+    @property
+    def event_storage_data(self) -> ConfigurableClassData:
+        return cast(ConfigurableClass, self.event_log_storage).inst_data
+
+    @property
+    def run_storage_data(self) -> ConfigurableClassData:
+        return cast(ConfigurableClass, self.run_storage).inst_data
+
+    @property
+    def schedule_storage_data(self) -> ConfigurableClassData:
+        return cast(ConfigurableClass, self.schedule_storage).inst_data
