@@ -1,8 +1,6 @@
 from abc import ABC, abstractproperty
-from typing import Optional
 
 from dagster.core.instance import MayHaveInstanceWeakref
-from dagster.serdes import ConfigurableClassData
 
 from .event_log.base import EventLogStorage
 from .runs.base import RunStorage
@@ -31,16 +29,4 @@ class DagsterStorage(ABC, MayHaveInstanceWeakref):
 
     @abstractproperty
     def schedule_storage(self) -> ScheduleStorage:
-        raise NotImplementedError()
-
-    @abstractproperty
-    def event_storage_data(self) -> Optional[ConfigurableClassData]:
-        raise NotImplementedError()
-
-    @abstractproperty
-    def run_storage_data(self) -> Optional[ConfigurableClassData]:
-        raise NotImplementedError()
-
-    @abstractproperty
-    def schedule_storage_data(self) -> Optional[ConfigurableClassData]:
         raise NotImplementedError()

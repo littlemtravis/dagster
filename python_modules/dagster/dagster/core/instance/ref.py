@@ -1,5 +1,5 @@
 import os
-from typing import Dict, NamedTuple, Optional, Union
+from typing import Dict, NamedTuple, Optional, Sequence
 
 import yaml
 
@@ -41,106 +41,104 @@ def configurable_class_data_or_default(config_value, field_name, default):
     )
 
 
-@whitelist_for_serdes
-class CompositeStorageRef(
-    NamedTuple(
-        "_CompositeStorageRef",
-        [
-            ("run_storage_data", ConfigurableClassData),
-            ("event_storage_data", ConfigurableClassData),
-            ("schedule_storage_data", ConfigurableClassData),
-        ],
-    )
-):
-    def __new__(
-        cls,
-        run_storage_data: ConfigurableClassData,
-        event_storage_data: ConfigurableClassData,
-        schedule_storage_data: Optional[ConfigurableClassData],
-    ):
-        return super(cls, CompositeStorageRef).__new__(
-            cls,
-            run_storage_data=check.inst_param(
-                run_storage_data, "run_storage_data", ConfigurableClassData
-            ),
-            event_storage_data=check.inst_param(
-                event_storage_data, "event_storage_data", ConfigurableClassData
-            ),
-            schedule_storage_data=check.opt_inst_param(
-                schedule_storage_data, "schedule_storage_data", ConfigurableClassData
-            ),
-        )
-
-    def rehydrate(self):
-        from dagster.core.storage.legacy_storage import LegacyStorage
-
-        return LegacyStorage(
-            self.run_storage_data.rehydrate(),
-            self.event_storage_data.rehydrate(),
-            self.schedule_storage_data.rehydrate() if self.schedule_storage_data else None,
-        )
-
-
-def configurable_storage_data(config_field) -> CompositeStorageRef:
-    if "postgres" in config_field:
+def configurable_storage_data(config_field, defaults) -> Sequence[ConfigurableClassData]:
+    if not config_field:
+        storage_data = defaults.get("storage")
+        run_storage_data = defaults.get("run_storage")
+        event_storage_data = defaults.get("event_log_storage")
+        schedule_storage_data = defaults.get("schedule_storage")
+    elif "postgres" in config_field:
         config_yaml = yaml.dump(config_field["postgres"], default_flow_style=False)
-        return CompositeStorageRef(
-            run_storage_data=ConfigurableClassData(
-                module_name="dagster_postgres",
-                class_name="PostgresRunStorage",
-                config_yaml=config_yaml,
-            ),
-            event_storage_data=ConfigurableClassData(
-                module_name="dagster_postgres",
-                class_name="PostgresEventLogStorage",
-                config_yaml=config_yaml,
-            ),
-            schedule_storage_data=ConfigurableClassData(
-                module_name="dagster_postgres",
-                class_name="PostgresScheduleStorage",
-                config_yaml=config_yaml,
-            ),
+        storage_data = ConfigurableClassData(
+            module_name="dagster_postgres",
+            class_name="DagsterPostgresStorage",
+            config_yaml=config_yaml,
         )
+        # for backwards compatibility
+        run_storage_data = ConfigurableClassData(
+            module_name="dagster_postgres",
+            class_name="PostgresRunStorage",
+            config_yaml=config_yaml,
+        )
+        event_storage_data = ConfigurableClassData(
+            module_name="dagster_postgres",
+            class_name="PostgresEventLogStorage",
+            config_yaml=config_yaml,
+        )
+        schedule_storage_data = ConfigurableClassData(
+            module_name="dagster_postgres",
+            class_name="PostgresScheduleStorage",
+            config_yaml=config_yaml,
+        )
+
     elif "mysql" in config_field:
         config_yaml = yaml.dump(config_field["mysql"], default_flow_style=False)
-        return CompositeStorageRef(
-            run_storage_data=ConfigurableClassData(
-                module_name="dagster_mysql",
-                class_name="MySQLRunStorage",
-                config_yaml=config_yaml,
-            ),
-            event_storage_data=ConfigurableClassData(
-                module_name="dagster_mysql",
-                class_name="MySQLEventLogStorage",
-                config_yaml=config_yaml,
-            ),
-            schedule_storage_data=ConfigurableClassData(
-                module_name="dagster_mysql",
-                class_name="MySQLScheduleStorage",
-                config_yaml=config_yaml,
-            ),
+        storage_data = ConfigurableClassData(
+            module_name="dagster_mysql",
+            class_name="DagsterMySQLStorage",
+            config_yaml=config_yaml,
         )
+        # for backwards compatibility
+        run_storage_data = ConfigurableClassData(
+            module_name="dagster_mysql",
+            class_name="MySQLRunStorage",
+            config_yaml=config_yaml,
+        )
+        event_storage_data = ConfigurableClassData(
+            module_name="dagster_mysql",
+            class_name="MySQLEventLogStorage",
+            config_yaml=config_yaml,
+        )
+        schedule_storage_data = ConfigurableClassData(
+            module_name="dagster_mysql",
+            class_name="MySQLScheduleStorage",
+            config_yaml=config_yaml,
+        )
+
     elif "sqlite" in config_field:
         base_dir = check.str_elem(config_field["sqlite"], "base_dir")
-        return CompositeStorageRef(
-            run_storage_data=ConfigurableClassData(
-                "dagster.core.storage.runs",
-                "SqliteRunStorage",
-                yaml.dump({"base_dir": _runs_directory(base_dir)}, default_flow_style=False),
-            ),
-            event_storage_data=ConfigurableClassData(
-                "dagster.core.storage.event_log",
-                "SqliteEventLogStorage",
-                yaml.dump({"base_dir": _event_logs_directory(base_dir)}, default_flow_style=False),
-            ),
-            schedule_storage_data=ConfigurableClassData(
-                "dagster.core.storage.schedules",
-                "SqliteScheduleStorage",
-                yaml.dump({"base_dir": _schedule_directory(base_dir)}, default_flow_style=False),
-            ),
+        storage_data = ConfigurableClassData(
+            "dagster.core.storage.sqlite_storage",
+            "DagsterSqliteStorage",
+            yaml.dump({"base_dir": base_dir}, default_flow_style=False),
         )
+        run_storage_data = ConfigurableClassData(
+            "dagster.core.storage.runs",
+            "SqliteRunStorage",
+            yaml.dump({"base_dir": _runs_directory(base_dir)}, default_flow_style=False),
+        )
+        event_storage_data = ConfigurableClassData(
+            "dagster.core.storage.event_log",
+            "SqliteEventLogStorage",
+            yaml.dump({"base_dir": _event_logs_directory(base_dir)}, default_flow_style=False),
+        )
+        schedule_storage_data = ConfigurableClassData(
+            "dagster.core.storage.schedules",
+            "SqliteScheduleStorage",
+            yaml.dump({"base_dir": _schedule_directory(base_dir)}, default_flow_style=False),
+        )
+
     else:
-        return configurable_class_data(config_field["custom"])
+        storage_data = configurable_class_data(config_field["custom"])
+        storage_config_yaml = yaml.dump(
+            {
+                "module_name": storage_data.module_name,
+                "class_name": storage_data.class_name,
+                "config_yaml": storage_data.config_yaml,
+            },
+            default_flow_style=False,
+        )
+        run_storage_data = ConfigurableClassData(
+            "dagster.core.storage.legacy_storage", "LegacyRunStorage", storage_config_yaml
+        )
+        event_storage_data = ConfigurableClassData(
+            "dagster.core.storage.legacy_storage", "LegacyEventLogStorage", storage_config_yaml
+        )
+        schedule_storage_data = ConfigurableClassData(
+            "dagster.core.storage.legacy_storage", "LegacyScheduleStorage", storage_config_yaml
+        )
+
+    return [storage_data, run_storage_data, event_storage_data, schedule_storage_data]
 
 
 @whitelist_for_serdes
@@ -158,7 +156,7 @@ class InstanceRef(
             ("run_launcher_data", Optional[ConfigurableClassData]),
             ("settings", Dict[str, object]),
             ("custom_instance_class_data", Optional[ConfigurableClassData]),
-            ("storage_data", Optional[Union[ConfigurableClassData, CompositeStorageRef]]),
+            ("storage_data", Optional[ConfigurableClassData]),
         ],
     )
 ):
@@ -179,7 +177,7 @@ class InstanceRef(
         run_launcher_data: Optional[ConfigurableClassData],
         settings: Dict[str, object],
         custom_instance_class_data: Optional[ConfigurableClassData] = None,
-        storage_data: Optional[Union[ConfigurableClassData, CompositeStorageRef]] = None,
+        storage_data: Optional[ConfigurableClassData] = None,
     ):
         return super(cls, InstanceRef).__new__(
             cls,
@@ -213,9 +211,7 @@ class InstanceRef(
                 "instance_class",
                 ConfigurableClassData,
             ),
-            storage_data=check.opt_inst_param(
-                storage_data, "storage_data", (ConfigurableClassData, CompositeStorageRef)
-            ),
+            storage_data=check.opt_inst_param(storage_data, "storage_data", ConfigurableClassData),
         )
 
     @staticmethod
@@ -242,10 +238,10 @@ class InstanceRef(
                 "LocalArtifactStorage",
                 yaml.dump({"base_dir": base_dir}, default_flow_style=False),
             ),
-            "storage": CompositeStorageRef(
-                run_storage_data=default_run_storage_data,
-                event_storage_data=default_event_log_storage_data,
-                schedule_storage_data=default_schedule_storage_data,
+            "storage": ConfigurableClassData(
+                "dagster.core.storage.sqlite_storage",
+                "DagsterSqliteStorage",
+                yaml.dump({"base_dir": base_dir}, default_flow_style=False),
             ),
             "compute_logs": ConfigurableClassData(
                 "dagster.core.storage.local_compute_log_manager",
@@ -303,22 +299,13 @@ class InstanceRef(
             defaults["compute_logs"],
         )
 
-        if config_value.get("storage"):
-            storage_data = configurable_storage_data(config_value["storage"])
-
-            if isinstance(storage_data, CompositeStorageRef):
-                storage = storage_data
-                run_storage_data = storage.run_storage_data
-                event_storage_data = storage.event_storage_data
-                schedule_storage_data = storage.schedule_storage_data
-            else:
-                # The storage class is here, we have to rehydrate the class here, so that we can
-                # extract the individual storages to stash on the serialized instance ref
-                storage = storage_data.rehydrate()
-                run_storage_data = storage.run_storage_data
-                event_storage_data = storage.event_storage_data
-                schedule_storage_data = storage.schedule_storage_data
-        else:
+        if (
+            config_value.get("run_storage")
+            or config_value.get("event_log_storage")
+            or config_value.get("schedule_storage")
+        ):
+            # using legacy config, specifying config for each of the constituent storages, make sure
+            # to create a composite storage
             run_storage_data = configurable_class_data_or_default(
                 config_value, "run_storage", defaults["run_storage"]
             )
@@ -328,19 +315,38 @@ class InstanceRef(
             schedule_storage_data = configurable_class_data_or_default(
                 config_value, "schedule_storage", defaults["schedule_storage"]
             )
+            storage_data = ConfigurableClassData(
+                module_name="dagster.core.storage.legacy_storage",
+                class_name="CompositeStorage",
+                config_yaml=yaml.dump(
+                    {
+                        "run_storage": {
+                            "module_name": run_storage_data.module_name,
+                            "class_name": run_storage_data.class_name,
+                            "config_yaml": run_storage_data.config_yaml,
+                        },
+                        "event_log_storage": {
+                            "module_name": event_storage_data.module_name,
+                            "class_name": event_storage_data.class_name,
+                            "config_yaml": event_storage_data.config_yaml,
+                        },
+                        "schedule_storage": {
+                            "module_name": schedule_storage_data.module_name,
+                            "class_name": schedule_storage_data.class_name,
+                            "config_yaml": schedule_storage_data.config_yaml,
+                        },
+                    },
+                    default_flow_style=False,
+                ),
+            )
 
-            if (
-                config_value.get("run_storage")
-                or config_value.get("event_log_storage")
-                or config_value.get("schedule_storage")
-            ):
-                storage_data = CompositeStorageRef(
-                    run_storage_data=run_storage_data,
-                    event_storage_data=event_storage_data,
-                    schedule_storage_data=schedule_storage_data,
-                )
-            else:
-                storage_data = defaults["storage"]
+        else:
+            [
+                storage_data,
+                run_storage_data,
+                event_storage_data,
+                schedule_storage_data,
+            ] = configurable_storage_data(config_value.get("storage"), defaults)
 
         scheduler_data = configurable_class_data_or_default(
             config_value, "scheduler", defaults["scheduler"]

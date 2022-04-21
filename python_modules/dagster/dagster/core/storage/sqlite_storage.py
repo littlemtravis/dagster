@@ -52,7 +52,7 @@ class DagsterSqliteStorage(DagsterStorage, ConfigurableClass):
     """
 
     def __init__(self, base_dir, inst_data=None):
-        self.base_dir = check.str_param(base_dir)
+        self.base_dir = check.str_param(base_dir, "base_dir")
         self._run_storage = SqliteRunStorage.from_local(_runs_directory(base_dir))
         self._event_log_storage = SqliteEventLogStorage(_event_logs_directory(base_dir))
         self._schedule_storage = SqliteScheduleStorage.from_local(_schedule_directory(base_dir))

@@ -433,12 +433,21 @@ class DagsterInstance:
         klass = instance_ref.custom_instance_class or DagsterInstance
         kwargs = instance_ref.custom_instance_class_config
 
+        unified_storage = instance_ref.storage
+        run_storage = unified_storage.run_storage if unified_storage else instance_ref.run_storage
+        event_storage = (
+            unified_storage.event_log_storage if unified_storage else instance_ref.event_storage
+        )
+        schedule_storage = (
+            unified_storage.schedule_storage if unified_storage else instance_ref.schedule_storage
+        )
+
         return klass(  # type: ignore
             instance_type=InstanceType.PERSISTENT,
             local_artifact_storage=instance_ref.local_artifact_storage,
-            run_storage=instance_ref.run_storage,
-            event_storage=instance_ref.event_storage,
-            schedule_storage=instance_ref.schedule_storage,
+            run_storage=run_storage,
+            event_storage=event_storage,
+            schedule_storage=schedule_storage,
             compute_log_manager=instance_ref.compute_log_manager,
             scheduler=instance_ref.scheduler,
             run_coordinator=instance_ref.run_coordinator,
