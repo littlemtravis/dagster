@@ -24,9 +24,9 @@ class DagsterPostgresStorage(DagsterStorage, ConfigurableClass):
     To use Postgres for storage, you can add a block such as the following to your
     ``dagster.yaml``:
 
-    .. literalinclude:: ../../../../../../examples/docs_snippets/docs_snippets/deploying/dagster-pg.yaml
+    .. literalinclude:: ../../../../../../examples/docs_snippets/docs_snippets/deploying/postgres_dagster.yaml
        :caption: dagster.yaml
-       :lines: 1-10
+       :lines: 1-8
        :language: YAML
 
     Note that the fields in this config are :py:class:`~dagster.StringSource` and
