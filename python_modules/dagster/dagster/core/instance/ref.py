@@ -152,14 +152,15 @@ class InstanceRef(
             ("run_coordinator_data", Optional[ConfigurableClassData]),
             ("run_launcher_data", Optional[ConfigurableClassData]),
             ("settings", Dict[str, object]),
-            ("custom_instance_class_data", Optional[ConfigurableClassData]),
-            ("storage_data", Optional[ConfigurableClassData]),
             # Required for backwards compatibility, but going forward will be unused by new versions
             # of DagsterInstance, which instead will instead grab the constituent storages from the
             # unified `storage_data`, if it is populated.
             ("run_storage_data", ConfigurableClassData),
             ("event_storage_data", ConfigurableClassData),
             ("schedule_storage_data", ConfigurableClassData),
+            ("custom_instance_class_data", Optional[ConfigurableClassData]),
+            # unified storage field
+            ("storage_data", Optional[ConfigurableClassData]),
         ],
     )
 ):
@@ -171,14 +172,14 @@ class InstanceRef(
     def __new__(
         cls,
         local_artifact_storage_data: ConfigurableClassData,
-        run_storage_data: ConfigurableClassData,
-        event_storage_data: ConfigurableClassData,
         compute_logs_data: ConfigurableClassData,
-        schedule_storage_data: ConfigurableClassData,
         scheduler_data: Optional[ConfigurableClassData],
         run_coordinator_data: Optional[ConfigurableClassData],
         run_launcher_data: Optional[ConfigurableClassData],
         settings: Dict[str, object],
+        run_storage_data: ConfigurableClassData,
+        event_storage_data: ConfigurableClassData,
+        schedule_storage_data: ConfigurableClassData,
         custom_instance_class_data: Optional[ConfigurableClassData] = None,
         storage_data: Optional[ConfigurableClassData] = None,
     ):
@@ -187,17 +188,8 @@ class InstanceRef(
             local_artifact_storage_data=check.inst_param(
                 local_artifact_storage_data, "local_artifact_storage_data", ConfigurableClassData
             ),
-            run_storage_data=check.inst_param(
-                run_storage_data, "run_storage_data", ConfigurableClassData
-            ),
-            event_storage_data=check.inst_param(
-                event_storage_data, "event_storage_data", ConfigurableClassData
-            ),
             compute_logs_data=check.inst_param(
                 compute_logs_data, "compute_logs_data", ConfigurableClassData
-            ),
-            schedule_storage_data=check.inst_param(
-                schedule_storage_data, "schedule_storage_data", ConfigurableClassData
             ),
             scheduler_data=check.opt_inst_param(
                 scheduler_data, "scheduler_data", ConfigurableClassData
@@ -209,6 +201,15 @@ class InstanceRef(
                 run_launcher_data, "run_launcher_data", ConfigurableClassData
             ),
             settings=check.opt_dict_param(settings, "settings", key_type=str),
+            run_storage_data=check.inst_param(
+                run_storage_data, "run_storage_data", ConfigurableClassData
+            ),
+            event_storage_data=check.inst_param(
+                event_storage_data, "event_storage_data", ConfigurableClassData
+            ),
+            schedule_storage_data=check.inst_param(
+                schedule_storage_data, "schedule_storage_data", ConfigurableClassData
+            ),
             custom_instance_class_data=check.opt_inst_param(
                 custom_instance_class_data,
                 "instance_class",
