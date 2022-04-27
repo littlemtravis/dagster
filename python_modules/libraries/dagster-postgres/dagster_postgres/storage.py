@@ -18,7 +18,7 @@ class DagsterPostgresStorage(DagsterStorage, ConfigurableClass):
     """Postgres-backed dagster storage.
 
     Users should not directly instantiate this class; it is instantiated by internal machinery when
-    ``dagit`` and ``dagster-graphql`` load, based on the values in the ``dagster.yaml`` file in
+    ``dagit`` and ``dagster-daemon`` load, based on the values in the ``dagster.yaml`` file in
     ``$DAGSTER_HOME``. Configuration of this class should be done by setting values in that file.
 
     To use Postgres for storage, you can add a block such as the following to your

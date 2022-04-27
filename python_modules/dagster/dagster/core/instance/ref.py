@@ -147,16 +147,19 @@ class InstanceRef(
         "_InstanceRef",
         [
             ("local_artifact_storage_data", ConfigurableClassData),
-            ("run_storage_data", ConfigurableClassData),
-            ("event_storage_data", ConfigurableClassData),
             ("compute_logs_data", ConfigurableClassData),
-            ("schedule_storage_data", ConfigurableClassData),
             ("scheduler_data", Optional[ConfigurableClassData]),
             ("run_coordinator_data", Optional[ConfigurableClassData]),
             ("run_launcher_data", Optional[ConfigurableClassData]),
             ("settings", Dict[str, object]),
             ("custom_instance_class_data", Optional[ConfigurableClassData]),
             ("storage_data", Optional[ConfigurableClassData]),
+            # Required for backwards compatibility, but going forward will be unused by new versions
+            # of DagsterInstance, which instead will instead grab the constituent storages from the
+            # unified `storage_data`, if it is populated.
+            ("run_storage_data", ConfigurableClassData),
+            ("event_storage_data", ConfigurableClassData),
+            ("schedule_storage_data", ConfigurableClassData),
         ],
     )
 ):

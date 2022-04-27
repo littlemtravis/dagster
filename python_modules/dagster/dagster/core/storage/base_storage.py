@@ -8,13 +8,11 @@ from .schedules.base import ScheduleStorage
 
 
 class DagsterStorage(ABC, MayHaveInstanceWeakref):
-    """Abstract base class for storing pipeline run history.
-
-    Note that run storages using SQL databases as backing stores should implement
-    :py:class:`~dagster.core.storage.runs.SqlRunStorage`.
+    """Abstract base class for Dagster persistent storage, for reading and writing data for runs,
+    events, and schedule/sensor state.
 
     Users should not directly instantiate concrete subclasses of this class; they are instantiated
-    by internal machinery when ``dagit`` and ``dagster-graphql`` load, based on the values in the
+    by internal machinery when ``dagit`` and ``dagster-daemon`` load, based on the values in the
     ``dagster.yaml`` file in ``$DAGSTER_HOME``. Configuration of concrete subclasses of this class
     should be done by setting values in that file.
     """
