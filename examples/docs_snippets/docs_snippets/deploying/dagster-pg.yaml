@@ -1,8 +1,8 @@
 storage:
   postgres:
     postgres_db:
-      username: { username }
-      password: { password }
-      hostname: { hostname }
-      db_name: { db_name }
-      port: { port }
+      username: my_username
+      password: my_password
+      hostname: my_hostname
+      db_name: my_database
+      port: 5432

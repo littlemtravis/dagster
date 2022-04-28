@@ -1,4 +1,4 @@
-from abc import ABC, abstractproperty
+from abc import ABC, abstractmethod
 
 from dagster.core.instance import MayHaveInstanceWeakref
 
@@ -17,14 +17,17 @@ class DagsterStorage(ABC, MayHaveInstanceWeakref):
     should be done by setting values in that file.
     """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def event_log_storage(self) -> EventLogStorage:
         raise NotImplementedError()
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def run_storage(self) -> RunStorage:
         raise NotImplementedError()
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def schedule_storage(self) -> ScheduleStorage:
         raise NotImplementedError()
