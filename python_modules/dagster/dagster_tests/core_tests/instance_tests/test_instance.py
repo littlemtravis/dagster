@@ -66,7 +66,7 @@ def test_partial_storage(tmpdir):
                 },
             }
         }
-    ) as instance:
+    ) as _instance:
         pass
 
 
@@ -79,7 +79,7 @@ def test_unified_storage(tmpdir):
                 }
             }
         }
-    ) as instance:
+    ) as _instance:
         pass
 
 
