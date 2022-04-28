@@ -16,32 +16,8 @@ To host Dagit or Dagster Daemon on a bare VM or in Docker on GCE, see [Running D
 We recommend launching a Cloud SQL PostgreSQL instance for run and events data. You can configure Dagit to use Cloud SQL to run and events data by setting blocks in your `$DAGSTER_HOME/dagster.yaml` appropriately:
 
 ```python file=/deploying/dagster-pg.yaml
-run_storage:
-  module: dagster_postgres.run_storage
-  class: PostgresRunStorage
-  config:
-    postgres_db:
-      username: { username }
-      password: { password }
-      hostname: { hostname }
-      db_name: { database }
-      port: { port }
-
-event_log_storage:
-  module: dagster_postgres.event_log
-  class: PostgresEventLogStorage
-  config:
-    postgres_db:
-      username: { username }
-      password: { password }
-      hostname: { hostname }
-      db_name: { db_name }
-      port: { port }
-
-schedule_storage:
-  module: dagster_postgres.schedule_storage
-  class: PostgresScheduleStorage
-  config:
+storage:
+  postgres:
     postgres_db:
       username: { username }
       password: { password }

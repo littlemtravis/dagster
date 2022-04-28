@@ -72,32 +72,8 @@ In production, more configuration is required.
 First, ensure that appropriate persistent run and event log storage, e.g., **`PostgresRunStorage`** and **`PostgresEventLogStorage`**, are configured on your Dagster instance, so that Dagit and the workers can communicate information about the run and events. You can do this by adding a block such as the following to your `dagster.yaml` (by default, Dagster will look for this file at `$DAGSTER_HOME/dagster.yaml` when the `DAGSTER_HOME` environment variable is set):
 
 ```python file=/deploying/dagster-pg.yaml
-run_storage:
-  module: dagster_postgres.run_storage
-  class: PostgresRunStorage
-  config:
-    postgres_db:
-      username: { username }
-      password: { password }
-      hostname: { hostname }
-      db_name: { database }
-      port: { port }
-
-event_log_storage:
-  module: dagster_postgres.event_log
-  class: PostgresEventLogStorage
-  config:
-    postgres_db:
-      username: { username }
-      password: { password }
-      hostname: { hostname }
-      db_name: { db_name }
-      port: { port }
-
-schedule_storage:
-  module: dagster_postgres.schedule_storage
-  class: PostgresScheduleStorage
-  config:
+storage:
+  postgres:
     postgres_db:
       username: { username }
       password: { password }

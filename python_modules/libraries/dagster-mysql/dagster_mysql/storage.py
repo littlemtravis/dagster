@@ -26,8 +26,6 @@ class DagsterMySQLStorage(DagsterStorage, ConfigurableClass):
 
     .. literalinclude:: ../../../../../../examples/docs_snippets/docs_snippets/deploying/dagster-mysql.yaml
        :caption: dagster.yaml
-       :start-after: start_marker_runs
-       :end-before: end_marker_runs
        :language: YAML
 
     Note that the fields in this config are :py:class:`~dagster.StringSource` and

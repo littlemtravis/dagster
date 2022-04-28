@@ -44,9 +44,7 @@ class DagsterSqliteStorage(DagsterStorage, ConfigurableClass):
     .. code-block:: YAML
 
         storage:
-          module: dagster.core.storage.sqlite_storage
-          class: DagsterSqliteStorage
-          config:
+          sqlite:
             base_dir: /path/to/dir
 
     """

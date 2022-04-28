@@ -225,10 +225,10 @@ class DagsterInstance:
     transient in-memory components.
 
     Configuration of this class should be done by setting values in ``$DAGSTER_HOME/dagster.yaml``.
-    For example, to use Postgres for run and event log storage, you can write a ``dagster.yaml``
-    such as the following:
+    For example, to use Postgres for dagster storage, you can write a ``dagster.yaml`` such as the
+    following:
 
-    .. literalinclude:: ../../../../../examples/docs_snippets/docs_snippets/deploying/postgres_dagster.yaml
+    .. literalinclude:: ../../../../../examples/docs_snippets/docs_snippets/deploying/dagster-pg.yaml
        :caption: dagster.yaml
        :language: YAML
 
