@@ -19,11 +19,11 @@ You can use a hosted RDS PostgreSQL database for your Dagster run/events data by
 storage:
   postgres:
     postgres_db:
-      username: { username }
-      password: { password }
-      hostname: { hostname }
-      db_name: { db_name }
-      port: { port }
+      username: my_username
+      password: my_password
+      hostname: my_hostname
+      db_name: my_database
+      port: 5432
 ```
 
 In this case, you'll want to ensure you provide the right connection strings for your RDS instance, and ensure that the node or container hosting Dagit is able to connect to RDS.

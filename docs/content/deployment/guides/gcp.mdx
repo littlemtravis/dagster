@@ -19,11 +19,11 @@ We recommend launching a Cloud SQL PostgreSQL instance for run and events data. 
 storage:
   postgres:
     postgres_db:
-      username: { username }
-      password: { password }
-      hostname: { hostname }
-      db_name: { db_name }
-      port: { port }
+      username: my_username
+      password: my_password
+      hostname: my_hostname
+      db_name: my_database
+      port: 5432
 ```
 
 In this case, you'll want to ensure you provide the right connection strings for your Cloud SQL instance, and that the node or container hosting Dagit is able to connect to Cloud SQL.

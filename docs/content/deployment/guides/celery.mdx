@@ -75,11 +75,11 @@ First, ensure that appropriate persistent run and event log storage, e.g., **`Po
 storage:
   postgres:
     postgres_db:
-      username: { username }
-      password: { password }
-      hostname: { hostname }
-      db_name: { db_name }
-      port: { port }
+      username: my_username
+      password: my_password
+      hostname: my_hostname
+      db_name: my_database
+      port: 5432
 ```
 
 **The same instance config must be present in Dagit's environment and in the workers' environments.** If you haven't already, please read about [the Dagster instance](/deployment/dagster-instance).
