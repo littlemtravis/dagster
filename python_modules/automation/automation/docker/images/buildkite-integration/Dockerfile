@@ -8,17 +8,9 @@
 ####################################################################################################
 
 ARG BASE_IMAGE
-ARG PYTHON_VERSION
 FROM "${BASE_IMAGE}" AS snapshot_builder
 
-RUN apt-get update \
-    && apt-get install -yqq \
-        # Needed for matplotlib on 3.8.7
-        pkg-config \
-        libfreetype6 \
-        libfreetype6-dev \
-        libpng-dev
-
+# Build a requirements file with all non-Dagster packages
 RUN git clone https://github.com/dagster-io/dagster.git \
     && cd dagster \
     && make install_dev_python_modules \
@@ -29,16 +21,7 @@ FROM "${BASE_IMAGE}"
 
 COPY --from=snapshot_builder /snapshot-reqs.txt .
 
-RUN apt-get update \
-    && apt-get install -yqq \
-        # Needed for matplotlib on 3.8.7
-        pkg-config \
-        libfreetype6 \
-        libfreetype6-dev \
-        libpng-dev \
-    && apt-get remove -yqq \
-    && apt-get autoremove -yqq --purge \
-    && apt-get clean
-
+# Preinstall non-Dagster packages in image so that the virtual environment
+# builds faster in Buildkite.
 RUN pip install -r /snapshot-reqs.txt \
     && rm /snapshot-reqs.txt
