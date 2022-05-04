@@ -18,6 +18,7 @@ from .test_images import core_test_image_depends_fn, publish_test_images, test_i
 GIT_REPO_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "..")
 
 branch_name = os.getenv("BUILDKITE_BRANCH")
+assert branch_name, "$BUILDKITE_BRANCH not set"
 
 
 def airflow_extra_cmds_fn(version):

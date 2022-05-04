@@ -49,7 +49,7 @@ def dagster():
             ),
         ]
 
-    # If we're in a Phabricator diff and are only making dagit changes, skip the
+    # If we're on a PR/feature branch and are only making dagit changes, skip the
     # remaining steps since they're not relevant to the diff.
     if not dagit_only:
         all_steps += dagster_steps()
