@@ -662,19 +662,12 @@ class CachingRepositoryData(RepositoryData):
                         f"Duplicate definition found for {definition.name}"
                     )
                 sensors[definition.name] = definition
-                if definition.has_loadable_targets():
-                    targets = definition.load_targets()
-                    for target in targets:
-                        pipelines_or_jobs[target.name] = target
             elif isinstance(definition, ScheduleDefinition):
                 if definition.name in sensors or definition.name in schedules:
                     raise DagsterInvalidDefinitionError(
                         f"Duplicate definition found for {definition.name}"
                     )
                 schedules[definition.name] = definition
-                if definition.has_loadable_target():
-                    target = definition.load_target()
-                    pipelines_or_jobs[target.name] = target
                 if isinstance(definition, PartitionScheduleDefinition):
                     partition_set_def = definition.get_partition_set()
                     if (
@@ -740,6 +733,23 @@ class CachingRepositoryData(RepositoryData):
                     f"Error when coercing graph '{name}' to job: A pipeline already exists with name '{name}'."
                 )
             jobs[name] = coerced_with_defaults
+
+        for name, sensor_def in sensors.items():
+            if sensor_def.has_loadable_targets():
+                targets = sensor_def.load_targets()
+                for target in targets:
+                    if target.is_job:
+                        jobs[target.name] = target
+                    else:
+                        pipelines[target.name] = target
+
+        for name, schedule_def in schedules.items():
+            if schedule_def.has_loadable_target():
+                target = schedule_def.load_target()
+                if target.is_job:
+                    jobs[target.name] = target
+                else:
+                    pipelines[target.name] = target
 
         return CachingRepositoryData(
             pipelines=pipelines,
