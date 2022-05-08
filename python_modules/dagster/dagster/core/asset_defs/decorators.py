@@ -241,6 +241,7 @@ def multi_asset(
     required_resource_keys: Optional[Set[str]] = None,
     compute_kind: Optional[str] = None,
     internal_asset_deps: Optional[Mapping[str, Set[AssetKey]]] = None,
+    can_subset: bool = False,
 ) -> Callable[[Callable[..., Any]], AssetsDefinition]:
     """Create a combined definition of multiple assets that are computed using the same op and same
     upstream assets.
@@ -266,6 +267,8 @@ def multi_asset(
             multi asset. If this default is not correct, you pass in a map of output names to a
             corrected set of AssetKeys that they depend on. Any AssetKeys in this list must be either
             used as input to the asset or produced within the op.
+        can_subset (bool): If this asset's computation can emit a subset of the asset
+            keys based on the context.selected_assets argument. Defaults to False.
     """
 
     check.invariant(
@@ -321,6 +324,7 @@ def multi_asset(
             asset_keys_by_output_name=asset_keys_by_output_name,
             node_def=op,
             asset_deps={asset_keys_by_output_name[name]: asset_deps[name] for name in asset_deps},
+            can_subset=can_subset,
         )
 
     return inner
