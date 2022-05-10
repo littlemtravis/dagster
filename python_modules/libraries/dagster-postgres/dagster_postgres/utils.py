@@ -9,8 +9,8 @@ import sqlalchemy
 
 from dagster import check
 from dagster.core.definitions.policy import Backoff, Jitter, calculate_delay
-from dagster.core.storage.sql import get_alembic_config, handle_schema_errors
 from dagster.core.storage.config import pg_config  # pylint: disable=unused-import
+from dagster.core.storage.sql import get_alembic_config, handle_schema_errors
 
 
 class DagsterPostgresException(Exception):
